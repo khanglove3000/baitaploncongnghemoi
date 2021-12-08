@@ -81,7 +81,7 @@ pyasn1-modules==0.2.8
 Pygments==2.10.0
 pypandoc==1.6.4
 pyparsing==2.4.7
-pypiwin32==223
+pypiwin32==302
 python-dateutil==2.8.2
 python-decouple==3.5
 python-dotenv==0.19.2
