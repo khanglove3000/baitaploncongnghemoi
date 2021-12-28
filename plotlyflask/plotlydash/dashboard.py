@@ -13,7 +13,7 @@ import plotly.graph_objs as go
 import plotly.figure_factory as ff
 
 
-from .data import create_dataframe
+from .data import create_dataframe, create_get_business_report, create_get_finan_report, create_get_cashflow_report, create_get_basic_index
 from .layout import html_layout
 
 from datetime import datetime, timedelta
@@ -56,10 +56,15 @@ def init_dashboard(server):
     # Load DataFrame
     df = create_dataframe()
     data = create_dataframe()
+    get_business_report = create_get_business_report()
+    get_finan_report = create_get_finan_report()
+    get_cashflow_report = create_get_cashflow_report()
+    get_basic_index = create_get_basic_index()
+    print(data)
     train_size = int(len(data) * 0.8)
     test_size = len(data) - train_size
     train, test = data.iloc[0:train_size], data.iloc[train_size:len(data)]
-    THRESHOLD = 3.4
+    THRESHOLD = 3
     time_steps = 30
     test_test, batthuong, test_mae_loss, test_score_df = detetech_anomalies(train, test, THRESHOLD, time_steps)
   
@@ -98,7 +103,7 @@ def init_dashboard(server):
                                 id="nut_chon_bieudo",
                                 className="mr-1",
                                 n_clicks=1,
-                                style={"display": "block", "margin-left": "auto", "margin-right": "auto", "width": "5%"},
+                                style={"display": "block", "margin-left": "auto", "margin-right": "auto", "width": "20%"},
                             ),
                         ),
                    ]),
@@ -177,7 +182,7 @@ def init_dashboard(server):
     
         trace = []
         data = create_dataframe()
-        trace.append(go.Scatter(x=data["date"],y=data["volume"],mode='lines',
+        trace.append(go.Scatter(x=data["date"],y=data["volume"],mode='lines',fill="tozeroy",
             opacity=0.7,name='khối lượng giao dịch'))
         traces = [trace]
         data = [val for sublist in traces for val in sublist]
@@ -263,10 +268,10 @@ def init_dashboard(server):
      
         test_test, batthuong, test_mae_loss, test_score_df  = detetech_anomalies(train, test, THRESHOLD, time_steps)
 
-        trace.append(go.Scatter(x=test_test.date, y=test_test.volume,
+        trace.append(go.Scatter(x=test_test.date, y=test_test.volume,fill="tozeroy",
                     mode='lines',
                     name='khối lượng'))
-        trace.append(go.Scatter(x=batthuong.date, y=batthuong.volume,
+        trace.append(go.Scatter(x=batthuong.date, y=batthuong.volume,fill="tozeroy",
                     mode='markers',
                     name='Anomaly'))
         traces = [trace]
@@ -316,7 +321,7 @@ def init_dashboard(server):
 
             if chart_name == "Line":          
                 data=[
-                    go.Scatter(x=df.date,y=df.close ,mode='lines',
+                    go.Scatter(x=df.date,y=df.close ,mode='lines',fill="tozeroy",
                     opacity=0.7,name= f'Giá đóng cửa', textposition='bottom center')
                 ]
                 
@@ -473,7 +478,7 @@ def init_dashboard(server):
     
         trace = []
         data = create_dataframe()
-        trace.append(go.Scatter(x=data["date"],y=data["volume"],mode='lines',
+        trace.append(go.Scatter(x=data["date"],y=data["volume"],mode='lines',fill="tozeroy",
             opacity=0.7,name='khối lượng giao dịch'))
         traces = [trace]
         data = [val for sublist in traces for val in sublist]
@@ -509,9 +514,9 @@ def init_dashboard(server):
         data = create_dataframe()
         data_thangtruoc, dataset_test = data[0:int(len(data)*0.8)], data[int(len(data)*0.8):]
         trace = []
-        trace.append(go.Scatter(x=data['date'],y=data['close'],mode='lines',
+        trace.append(go.Scatter(x=data['date'],y=data['close'],mode='lines',fill="tozeroy",
             opacity=0.6,name=f'Huấn Luyện (Train)',textposition='bottom center'))
-        trace.append(go.Scatter(x=dataset_test['date'],y= dataset_test['close'], mode='lines',
+        trace.append(go.Scatter(x=dataset_test['date'],y= dataset_test['close'], mode='lines',fill="tozeroy",
             opacity=0.7,name=f'Kiểm Tra (Validation)',textposition='bottom center'))
        
         traces = [trace]
@@ -568,10 +573,10 @@ def init_dashboard(server):
 
         trace = []
 
-        trace.append(go.Scatter(x=data_date,y=data_close_price,mode='lines',
+        trace.append(go.Scatter(x=data_date,y=data_close_price,mode='lines',fill="tozeroy",
             opacity=0.6,name=f'Giá thực tế',textposition='bottom center'))
 
-        trace.append(go.Scatter(x=data_date,y=to_plot_data_y_train_pred,mode='lines',
+        trace.append(go.Scatter(x=data_date,y=to_plot_data_y_train_pred,mode='lines',fill="tozeroy",
             opacity=0.6,name=f'Giá dự đoán (train)',textposition='bottom center'))
 
         trace.append(go.Scatter(x=data_date,y=to_plot_data_y_val_pred,mode='markers',
@@ -627,10 +632,10 @@ def init_dashboard(server):
         trace = []
 
         
-        trace.append(go.Scatter(x=to_plot_data_date,y=to_plot_predicted_val,mode='markers',
+        trace.append(go.Scatter(x=to_plot_data_date,y=to_plot_predicted_val,mode='markers',fill="tozeroy",
             opacity=0.6,name=f'Giá dự đoán',textposition='bottom center'))
 
-        trace.append(go.Scatter(x=to_plot_data_date,y=to_plot_data_y_val_subset,mode='lines',
+        trace.append(go.Scatter(x=to_plot_data_date,y=to_plot_data_y_val_subset,mode='lines',fill="tozeroy",
             opacity=0.6,name=f'Giá thực tế',textposition='bottom center'))
 
         traces = [trace]
@@ -729,23 +734,29 @@ def create_data_table(df):
         data=df.to_dict("records"),
         sort_action="native",
         sort_mode="native",
-        page_size=10,
-        style_data={
-                'width': '100px',
-                'maxWidth': '100px',
-                'minWidth': '100px',
+       page_size=20,
+             style_header={
+                'backgroundColor': 'black',
+                'fontWeight': 'bold'
             },
-        # style_cell_conditional=[
-        #     {
-        #         'if': {'column_id': 'date'},
-        #         'width': '10%'
-        #     },
-        # ],
-        style_table={
-            'overflowX': 'auto'
-            }    
-    )
-
+            style_data={
+                    'width': '100px',
+                    'maxWidth': '100px',
+                    'minWidth': '100px',
+                    'backgroundColor': 'rgb(50, 50, 50)',
+                    'color': 'white'
+                },
+            style_cell_conditional=[
+                {
+                    'if': {'column_id': 'date'},
+                    'width': '30%',
+                    'border': '1px solid grey'
+                },
+            ],
+            style_table={
+                'overflowX': 'auto'
+                },
+            )
     return table
 
 def bang_nhanbietbatthuong(batthuong):
@@ -757,23 +768,31 @@ def bang_nhanbietbatthuong(batthuong):
             data=batthuong.to_dict("records"),
             sort_action="native",
             sort_mode="native",
-            page_size=10,
+            page_size=20,
+             style_header={
+                'backgroundColor': 'black',
+                'fontWeight': 'bold'
+            },
             style_data={
                     'width': '100px',
                     'maxWidth': '100px',
                     'minWidth': '100px',
+                    'backgroundColor': 'rgb(50, 50, 50)',
+                    'color': 'white'
                 },
             style_cell_conditional=[
                 {
                     'if': {'column_id': 'date'},
-                    'width': '30%'
+                    'width': '30%',
+                    'border': '1px solid grey'
                 },
             ],
             style_table={
                 'overflowX': 'auto'
-                }
+                },
             )
     return table
+
 
 def smape_kun(y_true, y_pred):
         return np.mean((np.abs(y_pred - y_true) * 200/ (np.abs(y_pred) +  np.abs(y_true))))

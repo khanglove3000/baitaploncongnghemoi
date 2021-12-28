@@ -7,7 +7,7 @@ from flask import render_template
 def home():
     """Landing page."""
     return render_template(
-        "index.jinja2",
+        "index.html",
         title="Chứng khoáng",
         description="Visualiz lên webapp.",
         template="home-template",
